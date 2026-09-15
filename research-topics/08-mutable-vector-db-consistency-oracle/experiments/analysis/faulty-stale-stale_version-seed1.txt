@@ -1,0 +1,3 @@
+   0  upsert(id=47, v=2, cat=e, num=70)
+   1  upsert(id=47, v=3, cat=e, num=42)
+   2  query(k=5, filter=∅)

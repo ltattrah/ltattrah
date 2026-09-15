@@ -1,2 +1,7 @@
 -r ../../common/requirements.txt
-# topic-specific packages (engine clients, network tools, study frameworks) go below
+pytest
+pyarrow
+# engines runnable in-process on a laptop (pinned by the versions recorded in runs/*/run.json)
+qdrant-client
+chromadb
+lancedb

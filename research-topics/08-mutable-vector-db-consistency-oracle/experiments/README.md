@@ -1,16 +1,26 @@
 # Experiments — Topic 08
 
-Layout (see `RESEARCH_STRATEGY.md` section 14 for the topic-specific subfolders to add):
+Black-box consistency and freshness oracle for mutable vector databases. See `model/semantic-model.md` for the contracts and failure classes, `LOG.md` for the dated lab log.
 
-- `config.yaml` — parameters and the minimum evidence package; frozen at the protocol freeze (Day 30).
-- `reproduce.py` — one-command reproduction; `--small` must finish in minutes on a laptop.
-- `runs/` — raw outputs, one directory per run with `run.json` provenance (never edited after writing). Large raw data stays out of git; commit manifests and hashes.
-- `analysis/` — scripts that turn `runs/` into the tables and figures in `../paper/`.
+## Setup
 
-Phases:
-1. Phase A — Semantic model (Days 1–25)
-2. Phase B — History generator and exact oracle (Days 15–50)
-3. Phase C — Campaign (Days 40–75)
-4. Phase D — Disclosure and ablation (Days 65–90)
+```bash
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt        # numpy, pyyaml, pytest, pyarrow, qdrant-client, chromadb, lancedb
+python -m pytest tests -q              # classifier self-validation (reference + single-fault engines)
+python reproduce.py --small            # tests + short restart and crash campaigns on every available engine
+```
 
-Conventions: seeds fixed and logged; engine, tool, kernel, and CPU recorded per run; derived tables regenerated from raw outputs; nothing in `runs/` is hand-edited.
+## Layout
+
+- `vdbo/` — the oracle package: `model.py`, `generator.py`, `snapshot.py`, `oracle.py`, `runner.py`, `reducer.py`, `adapters/`.
+- `campaign.py` — engines × intensities × seeds × (restart | crash); writes `summary.jsonl`, `findings.jsonl`, `table.md`, `minimized/` into `runs/<stamp>-<hash>/` with `run.json` provenance.
+- `reproduce.py` — one-command entry point (`--small` for the smoke version).
+- `tests/` — pytest suite validating classifier precision against known faults.
+- `model/semantic-model.md` — contracts C1–C7, failure classes, decision procedure, probe protocol.
+- `runs/` — raw outputs (git-ignored); commit only `table.md` snapshots you cite, under `analysis/`.
+- `config.yaml` — minimum evidence package; frozen at the protocol freeze.
+
+## Adding an engine
+
+Subclass `vdbo.adapters.base.EngineAdapter`, implement `open/close/upsert/delete/query/get/count`, set `advertised`, and register it in `vdbo/adapters/__init__.py::available_real_engines`. Keep adapters thin; the model must not depend on product names.

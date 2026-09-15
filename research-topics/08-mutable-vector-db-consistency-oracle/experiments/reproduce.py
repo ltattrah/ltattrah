@@ -1,41 +1,50 @@
 """One-command reproduction entry point for Topic 08.
 
-    python reproduce.py --small     # smoke run on the small deterministic artifact
-    python reproduce.py             # full reproduction of the headline result
+    python reproduce.py --small     # oracle self-validation + a short campaign on every locally available engine
+    python reproduce.py             # full pilot: three mutation intensities, three seeds, clean restarts and SIGKILL crashes
 
-Every run records provenance through ``common/provenance.Run``. Replace the body of
-``main`` with the pipeline for this topic; keep the ``--small`` path under a few minutes.
+Runs write to ``runs/<timestamp>-<confighash>/`` with provenance (see ``../../common/provenance.py``).
+Requires the packages in ``requirements.txt`` (a virtualenv is recommended; see ``README.md``).
 """
 from __future__ import annotations
 
 import argparse
+import subprocess
 import sys
 from pathlib import Path
 
-import yaml
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "common"))
-from provenance import Run  # noqa: E402
+import campaign  # noqa: E402
+from vdbo.adapters import available_real_engines  # noqa: E402
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--config", default=Path(__file__).with_name("config.yaml"))
-    ap.add_argument("--small", action="store_true", help="run the small deterministic artifact only")
-    ap.add_argument("--out", default=Path(__file__).with_name("runs"))
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--small", action="store_true")
+    ap.add_argument("--skip-tests", action="store_true")
     args = ap.parse_args()
 
-    cfg = yaml.safe_load(Path(args.config).read_text())
-    cfg["small"] = bool(args.small)
+    if not args.skip_tests:
+        print("== oracle self-validation (reference + single-fault engines) ==", flush=True)
+        rc = subprocess.call([sys.executable, "-m", "pytest", str(HERE / "tests"), "-q"])
+        if rc != 0:
+            print("self-validation failed; not running engines", file=sys.stderr)
+            return rc
 
-    with Run(out_dir=args.out, config=cfg, seed=cfg.get("seed")) as run:
-        # TODO(topic 08): implement the pipeline. Phases from RESEARCH_STRATEGY.md section 6:
-        #   - Phase A — Semantic model (Days 1–25)
-        #   - Phase B — History generator and exact oracle (Days 15–50)
-        #   - Phase C — Campaign (Days 40–75)
-        #   - Phase D — Disclosure and ablation (Days 65–90)
-        raise NotImplementedError("pipeline not implemented yet; see RESEARCH_STRATEGY.md")
-    return 0
+    real = sorted(available_real_engines())
+    engines = ["reference", "faulty-ghost", "faulty-stale", "faulty-lag", "faulty-filter", "faulty-durability", *real]
+    print(f"== engines: {engines} ==", flush=True)
+    if args.small:
+        common = ["--engines", *engines, "--n-initial", "300", "--n-ops", "300", "--dim", "8", "--k", "5", "--seeds", "1"]
+        rc = campaign.main([*common, "--intensities", "0.6", "--reduce"])
+        rc |= campaign.main([*common, "--intensities", "0.6", "--crash", "--crash-every", "100"])
+        return rc
+    common = ["--engines", *engines, "--n-initial", "5000", "--n-ops", "3000", "--dim", "32", "--k", "10", "--seeds", "1", "2", "3", "--intensities", "0.3", "0.6", "0.9"]
+    rc = campaign.main([*common, "--reduce"])
+    rc |= campaign.main([*common, "--crash", "--crash-every", "250"])
+    return rc
 
 
 if __name__ == "__main__":

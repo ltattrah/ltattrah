@@ -12,7 +12,7 @@ Beyond Static Recall: A Black-Box Consistency and Freshness Oracle for Mutable V
 | Window | Work | Done |
 |---|---|---|
 | Days 1–14 | Review 25–40 papers on dynamic ANN, consistency testing, vector DB internals; reproduce one static recall result to anchor tolerance settings | [ ] |
-| Days 15–30 | Freeze the semantic model, failure classes, generator, checkpoint scheme, engines, stop conditions; small deterministic artifact | [ ] |
+| Days 15–30 | Freeze the semantic model, failure classes, generator, checkpoint scheme, engines, stop conditions; small deterministic artifact | [~] artifact and model v0.1 done 2026-09-15 (`experiments/`, `experiments/model/semantic-model.md`); freeze pending literature review |
 | Days 31–60 | Pilot at 100k vectors on 2 engines; failure prevalence, runtime, storage; hardest engine; one concurrent-history transfer | [ ] |
 | Days 61–90 | Full preregistered campaign; reducer; disclosure; package; draft around RQ1–RQ3 | [ ] |
 
@@ -31,5 +31,5 @@ Beyond Static Recall: A Black-Box Consistency and Freshness Oracle for Mutable V
 
 - [ ] Cover letter for The VLDB Journal written from `paper/cover-letter.md`
 - [ ] Fallback plan for ACM Transactions on Database Systems (TODS) noted
-- [ ] Artifact `experiments/reproduce.py --small` passes on a clean machine
+- [x] Artifact `experiments/reproduce.py --small` passes (2026-09-15, venv per `experiments/README.md`)
 - [ ] Limitations section separates measured findings from plausible explanations
