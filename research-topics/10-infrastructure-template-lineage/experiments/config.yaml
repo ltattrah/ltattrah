@@ -1,0 +1,12 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 10
+title: How Insecure Infrastructure Templates Propagate and Persist Across Repository Lineages
+seed: 20260915
+small: true
+minimum_evidence:
+  Repositories: Thousands
+  Validated lineages: Hundreds
+  Rules: High precision, documented on labelled sample
+  Repair lag: Distributions per lineage type
+  Uncertainty: Edge-level, propagated to share estimates
+  Triage: Warnings per true positive vs existing scanners (Checkov, tfsec, kube-linter)

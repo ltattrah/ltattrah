@@ -1,0 +1,13 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 5
+title: Learning Query Optimizer Stability Boundaries Under Continuous Skew and Correlation Drift
+seed: 20260915
+small: true
+minimum_evidence:
+  Query templates: ≥ 20
+  Data scales: Multiple
+  Engines: '3'
+  Statistics: Fresh and stale
+  Real-data validations: '2'
+  Metrics: Stability region size, boundary distance, cliff magnitude, worst-case regret, guard overhead,
+    false-alarm rate, regret avoided, cost of detecting a boundary

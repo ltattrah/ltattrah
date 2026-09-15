@@ -1,0 +1,14 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 1
+title: 'When Networking Results Reverse: A Cross-Emulator Benchmark of Claim Stability in Congestion Control
+  Experiments'
+seed: 20260915
+small: true
+minimum_evidence:
+  Artifacts: ≥ 12 independent
+  Backends: 3 (Mininet, ns-3, Linux tc)
+  Trials: Repeated under every influential factor
+  Validation: Second host or OS
+  Reconstruction: Headline table or figure rebuilt for each paper
+  Metrics: Sign agreement, rank agreement, standardized effect size, cross-environment variance, CSI,
+    variance components

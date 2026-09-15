@@ -1,0 +1,13 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 6
+title: Metamorphic Testing of Vector SQL and Hybrid Search Semantics Across Database Engines
+seed: 20260915
+small: true
+minimum_evidence:
+  Valid tests: Millions
+  Engines: ≥ 4
+  Validity filtering: Strong, with rejection statistics
+  Reduction ratios: High, reported
+  Confirmed bugs: Developer-confirmed wrong-result bugs
+  Artifact: Reproduce each confirmed defect with one command
+  Baseline: Cross-engine differential testing at equal budget

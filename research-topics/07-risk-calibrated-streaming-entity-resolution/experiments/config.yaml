@@ -1,0 +1,12 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 7
+title: Risk-Calibrated Streaming Entity Resolution Under Hard Byte and Latency Budgets
+seed: 20260915
+small: true
+minimum_evidence:
+  Precision, recall, F1 on accepted decisions: Plus accepted coverage
+  Selective risk and coverage: Conditional on entity frequency
+  Correction delay: Time from wrong decision to correction
+  Throughput and p99 latency: Per record
+  Serialized state bytes: The memory measure; never process-level RSS
+  Full-memory upper bound: Always included

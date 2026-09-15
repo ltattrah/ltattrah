@@ -1,0 +1,14 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 4
+title: Detectability-Preserving Adaptive Flow Sampling for Rare Network Attacks Under Fixed Telemetry
+  Budgets
+seed: 20260915
+small: true
+minimum_evidence:
+  Precision and recall: Attack class
+  False positives per hour: Dataset, budget
+  Detection delay: Attack class
+  Calibration: Detector, budget
+  Records and bytes retained: Budget
+  Detection gain per storage unit: Method
+  Estimator bias and variance: Budget, floor

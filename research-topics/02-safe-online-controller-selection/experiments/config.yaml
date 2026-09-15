@@ -1,0 +1,13 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 2
+title: Safety-Constrained Online Controller Selection for Intermittent and Asymmetric Access Networks
+seed: 20260915
+small: true
+minimum_evidence:
+  Trace families: ≥ 20, source-grouped splits
+  Seeds: ≥ 5 per condition
+  Baselines: CUBIC, BBR, delay-based, rule-based switcher, oracle, Mutant (if available)
+  Safety metrics: Explicit violation counts, violation magnitude, adaptation time after change
+  Fairness: With competing flows
+  Transfer: Unseen trace families
+  Implementation: One result outside the simulator

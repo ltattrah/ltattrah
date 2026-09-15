@@ -1,0 +1,12 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 9
+title: Prospective Selective Phishing Detection Under Campaign, Source, and Collection Shift
+seed: 20260915
+small: true
+minimum_evidence:
+  Corpus: Unique, time-ordered, multi-source, ≥ 18 months
+  Metrics: Precision at fixed FPR, false positives per week, selective risk and coverage, calibration,
+    lead time on campaigns
+  Transfer: Campaign and source transfer
+  Evaluation: Prospective replay or shadow deployment
+  Baselines: Random split (optimism), periodic retraining, no maintenance, threshold-only abstention

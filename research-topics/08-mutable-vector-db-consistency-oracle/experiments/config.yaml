@@ -1,0 +1,14 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 8
+title: 'Beyond Static Recall: A Black-Box Consistency and Freshness Oracle for Mutable Vector Databases'
+seed: 20260915
+small: true
+minimum_evidence:
+  Vectors: 100k–1M for most tests
+  Engines: ≥ 4
+  Mutation intensities: '3'
+  History modes: Sequential and concurrent
+  Restarts: Included
+  Checkpoints: Exact
+  Evidence: Developer confirmation or independently reproducible contract violations
+  Baseline: Static recall measurement (shows what it misses)

@@ -1,0 +1,13 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 3
+title: Silent Privacy Regression in Encrypted DNS Fallback Under Loss, Outage, and Resolver Failure
+seed: 20260915
+small: true
+minimum_evidence:
+  Clients: ≥ 4, versions pinned
+  Resolvers: ≥ 4 including local controlled
+  Impairment regimes: ≥ 8
+  Sessions: Cold and warm
+  Metrics: Failure rate, tail latency (CI), retries, endpoint changes, plaintext fallback rate, cache
+    hits, measured leakage per state
+  Validation: Second OS or access network

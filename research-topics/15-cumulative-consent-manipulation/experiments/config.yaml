@@ -1,0 +1,11 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 15
+title: Cumulative Effects of Repeated Consent Manipulation on Preference Alignment and Privacy Fatigue
+seed: 20260915
+small: true
+minimum_evidence:
+  Sample: Longitudinal, powered for treatment × time interactions
+  Measures: Validated fatigue and control scales; objective choice alignment
+  Attrition: Analysis and sensitivity to differential attrition
+  Preregistration: Full
+  Ethics: Full protocol

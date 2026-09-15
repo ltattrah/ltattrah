@@ -5,9 +5,15 @@ Source: *Publication Readiness Audit of Fifteen Laptop Feasible Computer Science
 Each folder below holds one topic. Every folder contains:
 
 - `RESEARCH_STRATEGY.md` – the research strategy for the revised topic (contribution, research questions, study design, evidence package, artifact plan, risks, stop conditions, 90-day plan, journal strategy).
-- `literature/` – closest-work matrix, reading notes, systematic search logs.
-- `experiments/` – code, configurations, seeds, raw and derived results.
-- `paper/` – manuscript drafts, figures, cover letter, reviewer response.
+- `CHECKLIST.md` – decision gates, the 90-day plan, and the non-negotiable journal requirements as tick boxes.
+- `literature/` – `closest-work.md` (matrix seeded from the audit, to be filled to at least five papers with exact claim differences), `search-log.csv` for auditable searches, and reading notes.
+- `experiments/` – `config.yaml` (parameters and minimum evidence package, frozen at Day 30), `reproduce.py` (one-command reproduction stub with `--small`), `requirements.txt`, `runs/` (raw outputs with per-run provenance, git-ignored), `analysis/`.
+- `paper/` – `outline.md` (structure mapped to research questions and hypotheses), `cover-letter.md` (primary journal, with fallback), `references.bib`.
+
+Portfolio-level files:
+
+- `REFERENCES.md` – the 42 audit references with links and the topics that cite each one.
+- `common/` – shared Python tooling: `provenance.py` (records commit, versions, CPU, seed, config hash per run) and the common `requirements.txt`.
 
 ## Audit rubric
 

@@ -1,0 +1,13 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 13
+title: 'When Explanations Transfer Confidence Without Improving Accuracy: A Multi-Study Test of Calibrated
+  Reliance'
+seed: 20260915
+small: true
+minimum_evidence:
+  Participants: Several hundred across two studies, powered for interactions and mediation
+  Constructs: Validated; manipulation and comprehension checks
+  Outcomes: Objective decision accuracy, calibration, behavioral reliance, persistence after assistance
+    ends
+  Replication: Across tasks and populations
+  Preregistration: Design, measures, exclusions, analysis

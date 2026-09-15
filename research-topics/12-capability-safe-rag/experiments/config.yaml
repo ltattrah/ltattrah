@@ -1,0 +1,14 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 12
+title: Capability-Safe Retrieval-Augmented Generation with Provenance-Enforced Control Flow Under Adaptive
+  Indirect Prompt Injection
+seed: 20260915
+small: true
+minimum_evidence:
+  Attack–task combinations: ≥ 1000
+  Attacker: Adaptive, observes defense
+  Models: 3 local quantized, plus held-out family
+  Tasks: Document QA, email/support, tool-using
+  Baselines: Filtering, prompting, StruQ, strict no-tool
+  Metrics: Unauthorized action, data exposure, benign utility, refusal, latency, policy errors (each separate)
+  Ablations: Every component

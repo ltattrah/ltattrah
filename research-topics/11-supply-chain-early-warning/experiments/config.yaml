@@ -1,0 +1,12 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 11
+title: Early Warning of Software Supply Chain Incidents with Positive-Unlabeled Temporal Risk Models
+seed: 20260915
+small: true
+minimum_evidence:
+  Snapshots: Several years, monthly
+  Incidents: Enough for stable estimation (target ≥ 100)
+  Validation: Expanding window
+  Curves: Analyst budget vs incidents caught and lead time
+  Uncertainty: Label uncertainty analysis
+  Baselines: Naive supervised classifier, heuristic scorecards, random under budget

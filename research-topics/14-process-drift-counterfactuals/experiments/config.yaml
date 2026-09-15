@@ -1,0 +1,11 @@
+# Frozen after Day 30 (protocol freeze). Change only before the confirmatory run.
+topic: 14
+title: 'From Process Drift Alerts to Action: Counterfactual Explanations for Operational Diagnosis'
+seed: 20260915
+small: true
+minimum_evidence:
+  Logs: Several public logs
+  Scenarios: Library of controlled drift with known causes
+  Explanation tests: Fidelity and stability
+  User study: Sufficiently powered, preregistered
+  Outcomes: Diagnosis accuracy, intervention selection, time, fidelity, inappropriate actions
