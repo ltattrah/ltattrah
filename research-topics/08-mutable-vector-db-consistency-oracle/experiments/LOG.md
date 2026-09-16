@@ -27,7 +27,7 @@
 |---|---|---|
 | Restart, all 9 configs | 2k vectors, dim 16, mi 0.6, restart every 200 | 0 violations, recall 1.0 everywhere (`analysis/2026-09-16-restart-2k-all-engines.md`) |
 | Crash + crash-during-rebuild, all 9 configs, 2 seeds | 2k vectors, crash every 200, crash-rebuild every 300 | 0 violations, recall 1.0 everywhere (`analysis/2026-09-16-crash-and-crash-rebuild-2k-2seeds.md`) |
-| Scale, 6 configs | 50k vectors, dim 32, 3000 ops, restart every 500 | in progress; Chroma 0.9852, Chroma small-sync 0.9884, LanceDB IVF_FLAT 1.0, Milvus Lite 1.0 recall, 0 violations so far |
+| Scale, 6 configs | 50k vectors, dim 32, 3000 ops (1216 queries each), restart every 500 | 0 violations on all six; recall Chroma 0.9852, Chroma small-sync 0.9884, LanceDB IVF_FLAT, Milvus Lite, Qdrant local, sqlite-vec all 1.0 (`analysis/2026-09-16-scale-50k-dim32.md`). Qdrant local took 354 s and warns above 20k points; server mode needed for larger runs |
 | Recall breakdown | Chroma 10k, dim 32 | 11 of 582 queries below 1.0, **all unfiltered**, each missing exactly one neighbour (recall 0.900); every filtered query exact |
 
 **Observations.**
