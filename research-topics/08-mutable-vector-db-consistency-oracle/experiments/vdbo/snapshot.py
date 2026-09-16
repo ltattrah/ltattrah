@@ -50,13 +50,13 @@ class Snapshot:
             self.writes.pop(op.id, None)
             if rec is not None:
                 self.deleted[op.id] = DeleteInfo(rec.version, op_index, self.epoch, synced=False)
-        elif op.kind in (OpKind.FLUSH, OpKind.REBUILD, OpKind.RESTART, OpKind.CRASH):
+        elif op.kind in (OpKind.FLUSH, OpKind.REBUILD, OpKind.RESTART, OpKind.CRASH, OpKind.CRASH_REBUILD):
             # every acknowledged write is expected to be visible and durable from here on
             for w in self.writes.values():
                 w.synced = True
             for d in self.deleted.values():
                 d.synced = True
-            if op.kind in (OpKind.RESTART, OpKind.CRASH):
+            if op.kind in (OpKind.RESTART, OpKind.CRASH, OpKind.CRASH_REBUILD):
                 self.epoch += 1
 
     # ---- exact retrieval ----

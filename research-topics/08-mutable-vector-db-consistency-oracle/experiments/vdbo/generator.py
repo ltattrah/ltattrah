@@ -28,6 +28,7 @@ class GenParams:
     flush_every: int = 50  # ops between flushes (0 disables)
     restart_every: int = 150  # ops between clean restarts (0 disables)
     crash_every: int = 0  # ops between SIGKILL crashes (0 disables; needs a crashable adapter)
+    crash_rebuild_every: int = 0  # ops between crashes injected during a rebuild (0 disables)
     n_clusters: int = 8
     cluster_spread: float = 0.35
 
@@ -88,6 +89,8 @@ def generate(seed: int, params: GenParams | None = None) -> History:
             ops.append(Op(OpKind.RESTART))
         if p.crash_every and i % p.crash_every == 0:
             ops.append(Op(OpKind.CRASH))
+        if p.crash_rebuild_every and i % p.crash_rebuild_every == 0:
+            ops.append(Op(OpKind.CRASH_REBUILD))
 
         if rng.random() < p.mutation_intensity and live:
             u = rng.random()

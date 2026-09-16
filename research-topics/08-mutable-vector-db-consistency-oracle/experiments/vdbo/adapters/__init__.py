@@ -23,6 +23,18 @@ def available_real_engines() -> dict[str, type]:
     try:
         from .chroma_local import ChromaEngine
         out["chroma"] = ChromaEngine
+        out["chroma-smallsync"] = ChromaEngine.small_sync
+    except ImportError:
+        pass
+    try:
+        from .milvus_lite import MilvusLiteEngine
+        out["milvus-lite"] = MilvusLiteEngine
+        out["milvus-lite-eventually"] = MilvusLiteEngine.eventually
+    except ImportError:
+        pass
+    try:
+        from .sqlite_vec_local import SqliteVecEngine
+        out["sqlite-vec"] = SqliteVecEngine
     except ImportError:
         pass
     try:

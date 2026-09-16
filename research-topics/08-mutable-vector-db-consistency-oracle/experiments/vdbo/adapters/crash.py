@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import multiprocessing as mp
 import os
+import random
 import signal
+import time
 from typing import Any, Optional
 
 import numpy as np
@@ -54,6 +56,8 @@ class CrashableEngine(EngineAdapter):
         self._version = ""
         self.proc: Optional[mp.Process] = None
         self.crashes = 0
+        self.last_rebuild_s = 0.05
+        self._rng = random.Random(1234)
 
     # ---- process management ----
     def open(self) -> None:
@@ -84,6 +88,18 @@ class CrashableEngine(EngineAdapter):
         self.crashes += 1
         self.open()
 
+    def crash_during(self, cmd: str = "rebuild") -> float:
+        """Send ``cmd`` and SIGKILL the engine after a delay drawn from [0, last rebuild duration]."""
+        assert self.proc is not None
+        delay = self._rng.uniform(0.0, max(self.last_rebuild_s, 0.005))
+        self.conn.send((cmd, ()))
+        time.sleep(delay)
+        os.kill(self.proc.pid, signal.SIGKILL)
+        self.proc.join(timeout=30)
+        self.crashes += 1
+        self.open()
+        return delay
+
     def _call(self, cmd: str, *args: Any) -> Any:
         self.conn.send((cmd, args))
         status, payload = self.conn.recv()
@@ -111,7 +127,9 @@ class CrashableEngine(EngineAdapter):
         self._call("flush")
 
     def rebuild(self) -> None:
+        t0 = time.time()
         self._call("rebuild")
+        self.last_rebuild_s = time.time() - t0
 
     def version_info(self) -> str:
         return f"{self._version} [child process, SIGKILL crashes]"

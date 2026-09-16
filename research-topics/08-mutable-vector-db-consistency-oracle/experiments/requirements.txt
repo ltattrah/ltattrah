@@ -1,6 +1,8 @@
 -r ../../common/requirements.txt
 pytest
 pyarrow
+pymilvus[milvus_lite]
+sqlite-vec
 # engines runnable in-process on a laptop (pinned by the versions recorded in runs/*/run.json)
 qdrant-client
 chromadb

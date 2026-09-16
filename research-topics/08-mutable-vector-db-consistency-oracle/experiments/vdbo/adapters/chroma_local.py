@@ -28,10 +28,22 @@ class ChromaEngine(EngineAdapter):
         "restart_recovery": "collection reloads from path; HNSW index persisted",
     }
 
+    sync_threshold: Optional[int] = None  # HNSW persistence interval (writes); None = Chroma default (1000)
+    batch_size: Optional[int] = None
+
     def open(self) -> None:
         self.client = chromadb.PersistentClient(path=self.path)
         space = {"l2": "l2", "cosine": "cosine", "dot": "ip"}[self.metric]
-        self.col = self.client.get_or_create_collection(COLLECTION, metadata={"hnsw:space": space})
+        hnsw = {"space": space}
+        if self.sync_threshold is not None:
+            hnsw["sync_threshold"] = self.sync_threshold
+        if self.batch_size is not None:
+            hnsw["batch_size"] = self.batch_size
+        try:
+            self.col = self.client.get_or_create_collection(COLLECTION, configuration={"hnsw": hnsw})
+        except Exception:  # noqa: BLE001 - older API: hnsw settings via metadata keys
+            meta = {f"hnsw:{k}": v for k, v in hnsw.items()}
+            self.col = self.client.get_or_create_collection(COLLECTION, metadata=meta)
 
     def close(self) -> None:
         # drop the cached system so the next open really reloads from disk
@@ -84,4 +96,12 @@ class ChromaEngine(EngineAdapter):
         return int(self.col.count())
 
     def version_info(self) -> str:
-        return f"chromadb {chromadb.__version__} (PersistentClient, HNSW)"
+        extra = f", sync_threshold={self.sync_threshold}, batch_size={self.batch_size}" if self.sync_threshold else ""
+        return f"chromadb {chromadb.__version__} (PersistentClient, HNSW{extra})"
+
+    @classmethod
+    def small_sync(cls, **kw) -> "ChromaEngine":
+        eng = cls(**kw)
+        eng.sync_threshold, eng.batch_size = 20, 10
+        eng.name = "chroma-smallsync"
+        return eng

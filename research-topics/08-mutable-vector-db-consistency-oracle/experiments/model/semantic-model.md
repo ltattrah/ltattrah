@@ -1,4 +1,4 @@
-# Semantic model for mutable vector search (v0.1, frozen candidate)
+# Semantic model for mutable vector search (v0.2, frozen candidate)
 
 Status: **draft for the Day-30 protocol freeze.** Implemented in `../vdbo/` (`snapshot.py`, `oracle.py`, `runner.py`). Every term here is engine-independent; product behaviour enters only through the adapter's *advertised* column in §6.
 
@@ -18,6 +18,7 @@ A **collection** holds **records** `(id, version, vector, metadata)`. The client
 | `rebuild` | index rebuild / optimize / compaction hint |
 | `restart` | clean close and reopen from the same path |
 | `crash` | SIGKILL of the engine process, then reopen from the same path |
+| `crash_rebuild` | `rebuild` issued, then SIGKILL after a delay drawn from [0, duration of the last rebuild] |
 
 The version tag is stored in the payload (`_v`), so an engine that returns payloads makes versions observable without cooperation.
 
@@ -79,12 +80,16 @@ The runner issues the repeat and flush probes only when a discrepancy involves a
 |---|---|---|---|---|---|
 | `reference` | in-memory + atomic fsynced pickle | `flush` (no-op) | yes | yes | ground truth for the classifier |
 | `faulty-*` | reference with one injected fault | varies | yes | yes | precision tests (`tests/test_oracle.py`) |
-| `qdrant-local` | `QdrantClient(path=…)` | none exposed | yes | yes (via child process) | local mode is a Python implementation, not the Rust server |
-| `chroma` | `PersistentClient` (SQLite + HNSW) | none exposed | yes | yes | HNSW → approximate; persisted index |
-| `lancedb` | embedded, flat scan | none | yes | yes | every write is a new table version; `rebuild` = `optimize()` |
+| `qdrant-local` | `QdrantClient(path=…)` | none exposed | yes | yes | local mode is a Python implementation, not the Rust server |
+| `chroma` | `PersistentClient` (SQLite + HNSW) | none exposed | yes | yes | HNSW → approximate; index persisted every 1000 writes by default |
+| `chroma-smallsync` | as above, `sync_threshold=20`, `batch_size=10` | none exposed | yes | yes | forces frequent HNSW persistence so crashes land between persist points |
+| `lancedb` | embedded, flat scan | none | yes | yes | every write commits a new table version; `rebuild` = `optimize()` |
 | `lancedb-ivfflat` | embedded, IVF_FLAT built at `rebuild` | none | yes | yes | rows written after the index are scanned unindexed |
+| `milvus-lite` | `MilvusClient(uri=file)`, FLAT, `Strong` | `flush` (seals segments) | yes | yes | embedded Milvus core; `rebuild` = `compact()` |
+| `milvus-lite-eventually` | as above at `Eventually` | `flush` | yes | yes | documented weaker visibility; none observed in Lite so far |
+| `sqlite-vec` | `vec0` virtual table, exact, `synchronous=FULL` | none | yes | yes | transactional baseline; `rebuild` = `VACUUM` |
 
-Crash mode wraps any adapter in a child process (`adapters/crash.py`) and kills it with SIGKILL.
+Crash mode wraps any adapter in a child process (`adapters/crash.py`) and kills it with SIGKILL, either between operations (`crash`) or while a rebuild is in flight (`crash_rebuild`).
 
 ## 7. Validation of the classifier
 
@@ -96,4 +101,6 @@ Crash mode wraps any adapter in a child process (`adapters/crash.py`) and kills 
 - Integer ids, one vector per record, one dense vector space, L2 metric by default.
 - `flush` is a no-op on all three real engines, so visibility lag is unobservable there; any fresh-write discrepancy on them is classified as approximation with the detail "no flush probe available".
 - Qdrant local mode is not the production server; a server-mode adapter (Docker) is needed before any claim about Qdrant.
-- Scale so far: ≤ 1k vectors, dim ≤ 16. The evidence package requires 100k–1M.
+- **SIGKILL is process-level durability, not power loss.** Data the engine handed to the kernel survives a kill even without `fsync`. Losing the page cache needs a block-device or VM-level fault injector (dm-log-writes / CrashMonkey-style); until then C6 is verified only against application buffers.
+- Milvus Lite at `Eventually` shows the same behaviour as `Strong`; either Lite ignores the level in a single process or the window is shorter than one round trip. A server-mode Milvus adapter is needed to test the documented weakening.
+- Scale so far: ≤ 50k vectors, dim ≤ 32 (see `LOG.md`). The evidence package requires 100k–1M.

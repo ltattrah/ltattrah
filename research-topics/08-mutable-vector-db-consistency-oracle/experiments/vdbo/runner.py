@@ -67,8 +67,12 @@ def run_history(
     probe_sample: int = 25,
     workdir: Optional[str] = None,
     stop_on_first: bool = False,
+    batch_writes: bool = True,
 ) -> RunResult:
-    """``adapter_factory(path)`` must return an *unopened* adapter bound to a fresh path."""
+    """``adapter_factory(path)`` must return an *unopened* adapter bound to a fresh path.
+
+    With ``batch_writes`` consecutive insert/upsert ops with distinct ids are sent in one ``upsert`` call.
+    No query, delete, or structural op sits between them, so the logical snapshot is identical."""
     tmp = workdir or tempfile.mkdtemp(prefix="vdbo-")
     adapter = adapter_factory(tmp)
     snap = Snapshot()
@@ -78,10 +82,24 @@ def run_history(
     try:
         adapter.open()
         result.engine_version = adapter.version_info()
-        for i, op in enumerate(history.ops):
+        ops = history.ops
+        i = 0
+        while i < len(ops):
+            op = ops[i]
             if op.kind in (OpKind.INSERT, OpKind.UPSERT):
-                adapter.upsert([op.record])
-            elif op.kind == OpKind.DELETE:
+                batch = [op.record]
+                seen = {op.record.id}
+                j = i + 1
+                while batch_writes and j < len(ops) and ops[j].kind in (OpKind.INSERT, OpKind.UPSERT) and ops[j].record.id not in seen and len(batch) < 512:
+                    batch.append(ops[j].record)
+                    seen.add(ops[j].record.id)
+                    j += 1
+                adapter.upsert(batch)
+                for jj in range(i, j):
+                    snap.apply(ops[jj], jj)
+                i = j
+                continue
+            if op.kind == OpKind.DELETE:
                 adapter.delete([op.id])
             elif op.kind == OpKind.FLUSH:
                 adapter.flush()
@@ -93,9 +111,13 @@ def run_history(
             elif op.kind == OpKind.CRASH:
                 if getattr(adapter, "has_crash", False):
                     adapter.crash()
+            elif op.kind == OpKind.CRASH_REBUILD:
+                if getattr(adapter, "has_crash", False):
+                    adapter.crash_during("rebuild")
             snap.apply(op, i)
 
-            probe_now = (op.kind == OpKind.RESTART and adapter.has_restart) or (op.kind == OpKind.CRASH and getattr(adapter, "has_crash", False))
+            crashable = getattr(adapter, "has_crash", False)
+            probe_now = (op.kind == OpKind.RESTART and adapter.has_restart) or (op.kind in (OpKind.CRASH, OpKind.CRASH_REBUILD) and crashable)
             if probe_now:
                 live_ids = list(snap.live)
                 del_ids = list(snap.deleted)
@@ -124,6 +146,7 @@ def run_history(
                 result.verdicts.append(v)
                 if stop_on_first and (v.classes() - {FailureClass.APPROXIMATION, FailureClass.OK}):
                     break
+            i += 1
     except Exception as exc:  # noqa: BLE001 - report, never hide, adapter failures
         result.error = f"{type(exc).__name__}: {exc}"
     finally:

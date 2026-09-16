@@ -79,6 +79,7 @@ class OpKind(str, Enum):
     FLUSH = "flush"
     RESTART = "restart"
     CRASH = "crash"  # SIGKILL of the engine process, then reopen from disk
+    CRASH_REBUILD = "crash_rebuild"  # SIGKILL while a rebuild/compaction is in flight
 
 
 @dataclass
